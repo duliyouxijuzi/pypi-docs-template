@@ -1,0 +1,32 @@
+# This workflow will build & upload a Python Package to TestPyPi using Twine 
+# whenever a PR is merged or a commit is made to the master branch.
+
+name: Build and Publish Package to TestPyPi
+
+# This workflow will run when a PR is merged or when a commit is made directly to the master branch.
+# ref: https://github.community/t/trigger-workflow-only-on-pull-request-merge/17359/3
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+          cache: "pip"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+      - name: Build package
+        run: python -m build
+      - name: pypi-publish
+        uses: pypa/gh-action-pypi-publish@v1.8.5
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
